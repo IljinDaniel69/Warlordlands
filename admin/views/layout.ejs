@@ -29,7 +29,7 @@
             background: #2c3e50;
             color: white;
             padding: 1rem;
-            margin-bottom: 2rem;
+            margin-bottom: 0; /* Removed grey area */
         }
         
         .header h1 {
@@ -40,7 +40,9 @@
         .nav {
             background: #34495e;
             padding: 0.5rem 1rem;
-            margin-bottom: 2rem;
+            display: flex;
+            align-items: center; /* Align items on the same line */
+            justify-content: space-between;
         }
         
         .nav a {
@@ -57,7 +59,6 @@
         }
         
         .nav .user-info {
-            float: right;
             color: #ecf0f1;
         }
         
@@ -67,7 +68,7 @@
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        
+
         .btn {
             display: inline-block;
             padding: 0.5rem 1rem;
@@ -260,22 +261,23 @@
     
     <% if (typeof userNick !== 'undefined' && typeof hideNav === 'undefined') { %>
     <div class="nav">
-        <a href="/admin">Dashboard</a>
-        <a href="/admin/users">Admin Users</a>
-        <a href="/admin/player">Players</a>
-        <a href="/admin/realm">Realms</a>
-        <a href="/admin/unit_type">Unit Types</a>
-        <a href="/admin/keywords">Keywords</a>
-        <a href="/admin/unit_classes">Unit Classes</a>
-        <a href="/admin/terrain_types">Terrain Types</a>
-        <a href="/admin/map">Map Tiles</a>
-        <a href="/admin/army">Armies</a>
-        <a href="/admin/unit">Units</a>
-        <a href="/admin/game_turns">Game Turns</a>
-        <a href="/admin/commands">Commands</a>
-
+        <div>
+            <a href="/admin">Dashboard</a>
+            <a href="/admin/users">Admin Users</a>
+            <a href="/admin/player">Players</a>
+            <a href="/admin/realm">Realms</a>
+            <a href="/admin/unit_type">Unit Types</a>
+            <a href="/admin/keywords">Keywords</a>
+            <a href="/admin/unit_classes">Unit Classes</a>
+            <a href="/admin/terrain_types">Terrain Types</a>
+            <a href="/admin/map">Map Tiles</a>
+            <a href="/admin/army">Armies</a>
+            <a href="/admin/unit">Units</a>
+            <a href="/admin/game_turns">Game Turns</a>
+            <a href="/admin/commands">Commands</a>
+        </div>
         <div class="user-info">
-            Welcome, <%= userNick %> | <a href="/logout">Logout</a>
+            <%= userNick %> | <a href="/logout">Logout</a>
         </div>
     </div>
     <% } %>
