@@ -58,14 +58,25 @@ https://creativecommons.org/licenses/by-nc-sa/4.0/
 
 ## Usage
 
-1. **Start the server**:
-   ```bash
-   # Development mode with auto-restart
-   npm run dev_admin
-   
-   # Production mode
-   npm start_admin
-   ```
+1. **Start the servers**:
+
+   - **Admin server**:
+     ```bash
+     # Development mode with auto-restart
+     npm run dev_admin
+     
+     # Production mode
+     npm start_admin
+     ```
+
+   - **Game server**:
+     ```bash
+     # Development mode with auto-restart
+     npm run dev_game
+     
+     # Production mode
+     npm start_game
+     ```
 
 2. **Access the admin panel**:
    Open your browser and go to `http://localhost:3000`
