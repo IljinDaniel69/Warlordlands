@@ -15,43 +15,48 @@ https://creativecommons.org/licenses/by-nc-sa/4.0/
 ## Installation
 
 1. **Install dependencies**:
+
    ```bash
    npm install
    ```
 
 2. **Set up environment variables**:
    Create a `.env` file in the root directory:
+
    ```
    # Database Configuration
    DB_HOST=localhost
    DB_USER=warlordlands_user
    DB_PASSWORD=your_password
    DB_NAME=warlordlands
-   
+
    # Server Configuration
    PORT=3000
    SESSION_SECRET=your-super-secret-session-key-change-this-in-production
-   
+
    # Security (set to true in production with HTTPS)
    NODE_ENV=development
    ```
 
 3. **Set up the database**:
+
    ```bash
    # Run the database creation script
    mysql -u root -p < dbscripts/001_create_database.sql
-   
+
    # Run the sample data script
    mysql -u root -p < dbscripts/100_sample_data.sql
    ```
 
 4. **Create admin user password hash**:
+
    ```bash
    # Generate a password hash (replace 'your_password' with actual password)
    node -e "const bcrypt = require('bcrypt'); bcrypt.hash('your_password', 10).then(hash => console.log(hash));"
    ```
-   
+
    Update the sample data script with the generated hash:
+
    ```sql
    UPDATE users SET password_hash = 'generated_hash_here' WHERE nick = 'admin';
    ```
@@ -60,20 +65,21 @@ https://creativecommons.org/licenses/by-nc-sa/4.0/
 
 1. **Start the servers**:
 
-   - **Admin server**:
-     ```bash
-     # Development mode with auto-restart
+   - ### Admin server (dev)
+     cd admin
+     npm install
      npm run dev_admin
-     
-     # Production mode
-     npm start_admin
-     ```
+
+   # Env:
+
+   DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, PORT (3000), SESSION_SECRET
 
    - **Game server**:
+
      ```bash
      # Development mode with auto-restart
      npm run dev_game
-     
+
      # Production mode
      npm start_game
      ```
