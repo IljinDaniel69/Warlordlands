@@ -156,6 +156,24 @@ app.get('/admin', requireAuth, async (req, res) => {
     }
 });
 
+// Lisää reitti karttanäkymälle
+app.get('/admin/map-view', async (req, res) => {
+    try {
+        // Hae tarvittavat tiedot karttaa varten (esim. armeijat, karttaruudut)
+        const [armies] = await pool.execute('SELECT * FROM armies');
+        const [mapTiles] = await pool.execute('SELECT * FROM map_tiles');
+
+        res.render('admin/map-view', {
+            title: 'Karttanäkymä',
+            armies: armies, // Lähetä armeijat näkymään
+            mapTiles: mapTiles // Lähetä karttaruudut näkymään
+        });
+    } catch (error) {
+        console.error('Error loading map view:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
 // Dedicated Game Turns admin page
 app.get('/admin/game_turns', requireAuth, async (req, res) => {
     try {
@@ -504,15 +522,25 @@ app.get('/admin/:table', requireAuth, async (req, res) => {
 // Generic table editing route
 app.get('/admin/:table/edit/:id', requireAuth, async (req, res) => {
     const { table, id } = req.params;
-    
+
     try {
-        const [rows] = await pool.execute(`SELECT * FROM ${table} WHERE id = ?`, [id]);
-        const [columns] = await pool.execute(`DESCRIBE ${table}`);
+        let query = `SELECT * FROM ${table} WHERE id = ?`;
+        let params = [id];
+
         
+        // Käytä "keyword"-saraketta, jos taulu on "keywords"
+        if (table === 'keywords') {
+            query = `SELECT * FROM ${table} WHERE keyword = ?`;
+            params = [id];
+        }
+
+        const [rows] = await pool.execute(query, params);
+        const [columns] = await pool.execute(`DESCRIBE ${table}`);
+
         if (rows.length === 0) {
             return res.status(404).send('Record not found');
         }
-        
+
         res.render('edit', {
             tableName: table,
             displayName: getDisplayName(table),
@@ -586,9 +614,23 @@ app.post('/admin/:table/add', requireAuth, async (req, res) => {
 // Delete record route
 app.post('/admin/:table/delete/:id', requireAuth, async (req, res) => {
     const { table, id } = req.params;
-    
+
     try {
-        await pool.execute(`DELETE FROM ${table} WHERE id = ?`, [id]);
+        let query = `DELETE FROM ${table} WHERE id = ?`;
+        let params = [id];
+
+        // Käytä "keyword"-saraketta, jos taulu on "keywords"
+        if (table === 'keywords') {
+            query = `DELETE FROM ${table} WHERE keyword = ?`;
+            params = [id];
+        }
+
+        const [result] = await pool.execute(query, params);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).send('Record not found');
+        }
+
         res.redirect(`/admin/${table}`);
     } catch (error) {
         console.error(`Error deleting record:`, error);
@@ -616,6 +658,41 @@ function getDisplayName(tableName) {
     };
     return displayNames[tableName] || tableName;
 }
+
+// Keywords editing route
+app.get('/admin/keywords/edit/:keyword', requireAuth, async (req, res) => {
+    const { keyword } = req.params;
+
+    try {
+        const [rows] = await pool.execute('SELECT * FROM keywords WHERE keyword = ?', [keyword]);
+
+        if (rows.length === 0) {
+            return res.status(404).send('Keyword not found');
+        }
+
+        res.render('edit_keyword', {
+            record: rows[0],
+            title: 'Edit Keyword',
+            userNick: req.session.userNick
+        });
+    } catch (error) {
+        console.error('Error loading keyword for editing:', error);
+        res.status(500).send('Error loading keyword');
+    }
+});
+
+app.post('/admin/keywords/edit/:keyword', requireAuth, async (req, res) => {
+    const { keyword } = req.params;
+    const { description } = req.body; // Oletetaan, että muokataan vain kuvausta
+
+    try {
+        await pool.execute('UPDATE keywords SET description = ? WHERE keyword = ?', [description, keyword]);
+        res.redirect('/admin/keywords');
+    } catch (error) {
+        console.error('Error updating keyword:', error);
+        res.status(500).send('Error updating keyword');
+    }
+});
 
 // Start server
 async function startServer() {
