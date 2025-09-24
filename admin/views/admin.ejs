@@ -1,12 +1,21 @@
 <h2>Admin Dashboard</h2>
-<p>Welcome to the Warlordlands administration panel. Select a table to manage its content.</p>
+<p>
+  Welcome to the Warlordlands administration panel. Select a table to manage its
+  content.
+</p>
 
 <div class="grid">
-    <% tables.forEach(function(table) { %>
-        <div class="card">
-            <h3><%= table.displayName %></h3>
-            <p>Manage <%= table.displayName.toLowerCase() %> data</p>
-            <a href="/admin/<%= table.name %>" class="btn btn-primary">View & Edit</a>
-        </div>
-    <% }); %>
+  <% tables.forEach(function(table) { %>
+  <div class="card">
+    <h3><%= table.displayName %></h3>
+    <p>Manage <%= table.displayName.toLowerCase() %> data</p>
+    <a href="/admin/<%= table.name %>" class="btn btn-primary">View & Edit</a>
+  </div>
+  <% }); %>
+  <!-- Add Map View card -->
+  <div class="card">
+    <h3>🗺️ Map View</h3>
+    <p>View the world map and armies as all players.</p>
+    <a href="/admin/map_view" class="btn btn-primary">Open Map View</a>
+  </div>
 </div>
