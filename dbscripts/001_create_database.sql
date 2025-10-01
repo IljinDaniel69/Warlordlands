@@ -7,7 +7,7 @@ DROP DATABASE IF EXISTS warlordlands;
 -- Create database with proper character encoding
 CREATE DATABASE warlordlands
     CHARACTER SET = 'utf8mb4'
-    COLLATE = 'utf8mb4_uca1400_ai_ci';
+    COLLATE = 'utf8mb4_general_ci';
 
 -- Create a dedicated user for the application
 -- Note: Replace 'your_password' with a secure password in production

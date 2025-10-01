@@ -1,44 +1,75 @@
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-    <h2><%= displayName %></h2>
-    <a href="/admin/<%= tableName %>/add" class="btn btn-success">Add New</a>
+<div
+  style="
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  "
+>
+  <h2><%= displayName %></h2>
+  <a href="/admin/<%= tableName %>/add" class="btn btn-success">Add New</a>
 </div>
 
 <% if (data.length === 0) { %>
-    <p>No records found in this table.</p>
+<p>No records found in this table.</p>
 <% } else { %>
-    <div style="overflow-x: auto;">
-        <table class="table">
-            <thead>
-                <tr>
-                    <% columns.forEach(function(column) { %>
-                        <th><%= column %></th>
-                    <% }); %>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% data.forEach(function(row) { %>
-                    <tr>
-                        <% columns.forEach(function(column) { %>
-                            <td>
-                                <% if (typeof row[column] === 'boolean') { %>
-                                    <%= row[column] ? 'Yes' : 'No' %>
-                                <% } else if (row[column] === null) { %>
-                                    <em>null</em>
-                                <% } else { %>
-                                    <%= row[column] %>
-                                <% } %>
-                            </td>
-                        <% }); %>
-                        <td>
-                            <a href="/admin/<%= tableName %>/edit/<%= row.id %>" class="btn btn-warning btn-sm">Edit</a>
-                            <form method="POST" action="/admin/<%= tableName %>/delete/<%= row.id %>" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this record?')">
-                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                            </form>
-                        </td>
-                    </tr>
-                <% }); %>
-            </tbody>
-        </table>
-    </div>
+<div style="overflow-x: auto">
+  <table class="table">
+    <thead>
+      <tr>
+        <% columns.forEach(function(column) { %>
+        <th><%= column %></th>
+        <% }); %>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% data.forEach(function(row) { %>
+      <tr>
+        <% columns.forEach(function(column) { %>
+        <td>
+          <% if (typeof row[column] === 'boolean') { %> <%= row[column] ? 'Yes'
+          : 'No' %> <% } else if (row[column] === null) { %>
+          <em>null</em>
+          <% } else { %> <%= row[column] %> <% } %>
+        </td>
+        <% }); %>
+        <td>
+          <% if (tableName === 'keywords') { %>
+          <!-- Keywords-taulun edit- ja delete-linkit -->
+          <a
+            href="/admin/keywords/edit/<%= row.keyword %>"
+            class="btn btn-warning btn-sm"
+            >Edit</a
+          >
+          <form
+            method="POST"
+            action="/admin/keywords/delete/<%= row.keyword %>"
+            style="display: inline"
+            onsubmit="return confirm('Are you sure you want to delete this keyword?')"
+          >
+            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+          </form>
+          <% } else { %>
+          <!-- Muut taulut -->
+          <a
+            href="/admin/<%= tableName %>/edit/<%= row.id %>"
+            class="btn btn-warning btn-sm"
+            >Edit</a
+          >
+          <form
+            method="POST"
+            action="/admin/<%= tableName %>/delete/<%= row.id %>"
+            style="display: inline"
+            onsubmit="return confirm('Are you sure you want to delete this record?')"
+          >
+            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+          </form>
+          <% } %>
+        </td>
+      </tr>
+      <% }); %>
+    </tbody>
+  </table>
+</div>
 <% } %>

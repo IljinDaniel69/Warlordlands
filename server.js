@@ -1,12 +1,19 @@
-const express = require('express');
-const mysql = require('mysql2/promise');
-const session = require('express-session');
-const bcrypt = require('bcrypt');
-const bodyParser = require('body-parser');
-const path = require('path');
-const expressLayouts = require('express-ejs-layouts');
-const TurnScheduler = require('./game/systems/TurnScheduler');
-require('dotenv').config();
+import express from 'express';
+import mysql from 'mysql2/promise';
+import session from 'express-session';
+import bcrypt from 'bcrypt';
+import bodyParser from 'body-parser';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import expressLayouts from 'express-ejs-layouts';
+import TurnScheduler from './game/systems/TurnScheduler.js';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+// ES module equivalent of __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.GAME_PORT || 3000; // Different port from admin server
@@ -273,95 +280,6 @@ app.get('/map', requireAuth, (req, res) => {
         pageCSS: '/css/map.css'
     });
 });
-
-// Map API endpoint
-app.get('/api/map/data', requireAuth, async (req, res) => {
-    try {
-        const Map = require('./game/world/Map');
-        const mapInstance = new Map(pool);
-        
-        const strategicInfo = await mapInstance.getStrategicMapInfo(req.session.playerId);
-        
-        res.json(strategicInfo);
-    } catch (error) {
-        console.error('Map data error:', error);
-        res.status(500).json({ error: 'Failed to load map data' });
-    }
-});
-
-// Commands API endpoints
-app.post('/api/commands/move', requireAuth, async (req, res) => {
-    try {
-        const { armyId, path } = req.body;
-        
-        // Validate the request
-        if (!armyId || !path || !Array.isArray(path) || path.length === 0) {
-            return res.status(400).json({ error: 'Invalid move command data' });
-        }
-        
-        // Get current game turn
-        const [currentTurn] = await pool.execute(
-            'SELECT id FROM game_turns WHERE status = "active" LIMIT 1'
-        );
-        
-        if (currentTurn.length === 0) {
-            return res.status(400).json({ error: 'No active game turn' });
-        }
-        
-        // Check if army already has a command for this turn
-        const [existingCommand] = await pool.execute(
-            'SELECT id FROM commands WHERE army_id = ? AND game_turn_id = ? AND status IN ("pending", "processing")',
-            [armyId, currentTurn[0].id]
-        );
-        
-        if (existingCommand.length > 0) {
-            return res.status(400).json({ error: 'Army already has a command for this turn' });
-        }
-        
-        // Create move command
-        const commandData = JSON.stringify({ path });
-        await pool.execute(
-            'INSERT INTO commands (player_id, army_id, game_turn_id, command_type, command_data, status) VALUES (?, ?, ?, ?, ?, ?)',
-            [req.session.playerId, armyId, currentTurn[0].id, 'move', commandData, 'pending']
-        );
-        
-        res.json({ success: true, message: 'Move command created successfully' });
-    } catch (error) {
-        console.error('Move command error:', error);
-        res.status(500).json({ error: 'Failed to create move command' });
-    }
-});
-
-app.get('/api/commands/army/:armyId', requireAuth, async (req, res) => {
-    try {
-        const { armyId } = req.params;
-        
-        // Get current game turn
-        const [currentTurn] = await pool.execute(
-            'SELECT id FROM game_turns WHERE status = "active" LIMIT 1'
-        );
-        
-        if (currentTurn.length === 0) {
-            return res.json({ hasCommand: false });
-        }
-        
-        // Check if army has a command for this turn
-        const [command] = await pool.execute(
-            'SELECT id, status FROM commands WHERE army_id = ? AND game_turn_id = ? AND status IN ("pending", "processing")',
-            [armyId, currentTurn[0].id]
-        );
-        
-        res.json({ 
-            hasCommand: command.length > 0,
-            commandStatus: command.length > 0 ? command[0].status : null
-        });
-    } catch (error) {
-        console.error('Command check error:', error);
-        res.status(500).json({ error: 'Failed to check command status' });
-    }
-});
-
-
 
 // Start server
 async function startServer() {
