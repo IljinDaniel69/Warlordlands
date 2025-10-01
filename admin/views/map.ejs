@@ -1,0 +1,203 @@
+<div class="form-container">
+  <h2>🗺️ Admin Map View</h2>
+  <p style="color: #7f8c8d; margin-bottom: 2rem">
+    All armies are shown as other players (no green own armies).
+  </p>
+  <div class="map-container">
+    <div class="map-controls">
+      <button id="zoomIn" class="btn btn-primary">🔍+</button>
+      <button id="zoomOut" class="btn btn-primary">🔍-</button>
+    </div>
+    <div class="map-viewport">
+      <div id="mapGrid" class="map-grid"></div>
+    </div>
+  </div>
+</div>
+<style>
+  .map-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .map-viewport {
+    height: 70vh; /* Ensure visible area */
+    overflow: auto;
+    border: 1px solid #e1e4e8;
+    background: #fff;
+    border-radius: 6px;
+    padding: 8px;
+    position: relative;
+  }
+  .map-grid {
+    display: inline-block; /* shrink to content, avoid stretching */
+    flex-direction: column;
+    gap: 1px; /* reduce to avoid rounding issues */
+    position: relative;
+    transform-origin: top left; /* keep scaling anchored */
+  }
+  .map-row {
+    display: flex;
+    gap: 1px;
+  }
+  .map-tile {
+    width: 32px;
+    height: 32px;
+    border: 1px solid #ccc;
+    background: #f8f8f8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-sizing: border-box; /* include border in fixed size */
+  }
+  .terrain-forest {
+    background: #b6e2a1;
+  }
+  .terrain-mountains {
+    background: #d1d1d1;
+  }
+  .terrain-desert {
+    background: #f9e79f;
+  }
+  .terrain-hills {
+    background: #e5c07b;
+  }
+  .terrain-unknown {
+    background: #888;
+  }
+  .army-indicator {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    font-size: 18px;
+  }
+  .terrain-icon {
+    font-size: 18px;
+  }
+</style>
+<script>
+  let currentZoom = 1;
+  let mapData = null;
+
+  document.addEventListener("DOMContentLoaded", function () {
+    loadMapData();
+    setupEventListeners();
+  });
+
+  function setupEventListeners() {
+    document.getElementById("zoomIn").addEventListener("click", () => {
+      currentZoom = Math.min(currentZoom * 1.2, 3);
+      updateMapDisplay();
+    });
+    document.getElementById("zoomOut").addEventListener("click", () => {
+      currentZoom = Math.max(currentZoom / 1.2, 0.5);
+      updateMapDisplay();
+    });
+  }
+
+  async function loadMapData() {
+    try {
+      const response = await fetch("/admin/api/map/data");
+      if (response.ok) {
+        mapData = await response.json();
+        renderMap();
+      } else {
+        showInfoMessage("Failed to load map data (" + response.status + ")");
+      }
+    } catch (error) {
+      console.error("Failed to load map data", error);
+      showInfoMessage("Failed to load map data. Check console and server logs.");
+    }
+  }
+
+  function renderMap() {
+    if (!mapData) return;
+    const mapGrid = document.getElementById("mapGrid");
+    const bounds = mapData.mapBounds;
+    if (!bounds || bounds.total_tiles === 0 || bounds.min_x === null) {
+      mapGrid.innerHTML = "";
+      showInfoMessage("No map tiles found. Populate the 'map' table or load sample data.");
+      return;
+    }
+    mapGrid.innerHTML = "";
+    for (let y = bounds.min_y; y <= bounds.max_y; y++) {
+      const row = document.createElement("div");
+      row.className = "map-row";
+      for (let x = bounds.min_x; x <= bounds.max_x; x++) {
+        const tile = createMapTile(x, y);
+        row.appendChild(tile);
+      }
+      mapGrid.appendChild(row);
+    }
+  }
+
+  function createMapTile(x, y) {
+    const tile = document.createElement("div");
+    tile.className = "map-tile";
+    tile.dataset.x = x;
+    tile.dataset.y = y;
+    const tileData = mapData.visibleTiles.find(
+      (t) => t.x_coord === x && t.y_coord === y
+    );
+    if (tileData) {
+      tile.classList.add(`terrain-${tileData.terrain_type}`);
+      tile.title = `${tileData.description} (${x}, ${y})`;
+      // Add terrain icon
+      const terrainIcon = document.createElement("div");
+      terrainIcon.className = "terrain-icon";
+      terrainIcon.textContent = getTerrainIcon(tileData.terrain_type);
+      tile.appendChild(terrainIcon);
+      // Show ALL armies as "enemy"
+      const armies = mapData.enemyArmies.filter(
+        (a) => a.x_coord === x && a.y_coord === y
+      );
+      armies.forEach((army, index) => {
+        const armyIndicator = document.createElement("div");
+        armyIndicator.className = "army-indicator enemy-army";
+        armyIndicator.textContent = "⚔️";
+        armyIndicator.title = `Army: ${army.name} (${army.realm_name})`;
+        if (index > 0) {
+          armyIndicator.style.position = "relative";
+          armyIndicator.style.left = `${index * 8}px`;
+          armyIndicator.style.top = `${index * 8}px`;
+        }
+        tile.appendChild(armyIndicator);
+      });
+    } else {
+      tile.classList.add("terrain-unknown");
+      tile.title = `Unknown Territory (${x}, ${y})`;
+      const terrainIcon = document.createElement("div");
+      terrainIcon.className = "terrain-icon";
+      terrainIcon.textContent = "❓";
+      terrainIcon.style.color = "#fff";
+      tile.appendChild(terrainIcon);
+    }
+    return tile;
+  }
+
+  function getTerrainIcon(terrainType) {
+    const icons = {
+      open: "",
+      forest: "🌲",
+      mountains: "⛰️",
+      water: "",
+      desert: "🏜️",
+      hills: "🏔️",
+    };
+    return terrainType in icons ? icons[terrainType] : "❓";
+  }
+
+  function updateMapDisplay() {
+    const mapGrid = document.getElementById("mapGrid");
+    mapGrid.style.transform = `scale(${currentZoom})`;
+  }
+
+  function showInfoMessage(message) {
+    const mapGrid = document.getElementById("mapGrid");
+    const msg = document.createElement("div");
+    msg.style.padding = "12px";
+    msg.style.color = "#555";
+    msg.textContent = message;
+    mapGrid.replaceChildren(msg);
+  }
+</script>
