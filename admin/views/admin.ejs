@@ -1,5 +1,9 @@
 <h2>Admin Dashboard</h2>
 <p>Welcome to the Warlordlands administration panel. Select a table to manage its content.</p>
+<p>
+  Welcome to the Warlordlands administration panel. Select a section to manage
+  its content.
+</p>
 
 <div class="grid">
     <% tables.forEach(function(table) { %>
@@ -9,4 +13,62 @@
             <a href="/admin/<%= table.name %>" class="btn btn-primary">View & Edit</a>
         </div>
     <% }); %>
+  <div class="card">
+    <h3>Game admin</h3>
+    <div class="grid">
+      <div class="card">
+        <h4>Admin Users</h4>
+        <a href="/admin/users" class="btn btn-primary">View & Edit</a>
+      </div>
+      <div class="card">
+        <h4>Players</h4>
+        <a href="/admin/player" class="btn btn-primary">View & Edit</a>
+      </div>
+      <div class="card">
+        <h4>Realms</h4>
+        <a href="/admin/realm" class="btn btn-primary">View & Edit</a>
+      </div>
+      <div class="card">
+        <h4>Armies</h4>
+        <a href="/admin/army" class="btn btn-primary">View & Edit</a>
+      </div>
+      <div class="card">
+        <h4>Units</h4>
+        <a href="/admin/unit" class="btn btn-primary">View & Edit</a>
+      </div>
+      <div class="card">
+        <h4>Game Turns</h4>
+        <a href="/admin/game_turns" class="btn btn-primary">View & Edit</a>
+      </div>
+      <div class="card">
+        <h4>Commands</h4>
+        <a href="/admin/commands" class="btn btn-primary">View & Edit</a>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Meta information</h3>
+    <div class="grid">
+      <div class="card">
+        <h4>Unit Types</h4>
+        <a href="/admin/unit_type" class="btn btn-primary">View & Edit</a>
+      </div>
+      <div class="card">
+        <h4>Unit Classes</h4>
+        <a href="/admin/unit_classes" class="btn btn-primary">View & Edit</a>
+      </div>
+      <div class="card">
+        <h4>Keywords</h4>
+        <a href="/admin/keywords" class="btn btn-primary">View & Edit</a>
+      </div>
+      <div class="card">
+        <h4>Terrain Types</h4>
+        <a href="/admin/terrain_types" class="btn btn-primary">View & Edit</a>
+      </div>
+      <div class="card">
+        <h4>Map Tiles</h4>
+        <a href="/admin/map" class="btn btn-primary">View & Edit</a>
+      </div>
+    </div>
+  </div>
 </div>
