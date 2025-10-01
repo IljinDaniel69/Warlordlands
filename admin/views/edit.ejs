@@ -1,6 +1,5 @@
 <div class="form-container">
     <h2>Edit <%= displayName %></h2>
-
     <form method="POST" action="/admin/<%= tableName %>/edit/<%= record.type %>">
     <% columns.forEach(function(column) { %>
         <div class="form-group">
@@ -18,11 +17,5 @@
                 <input type="text" id="<%= column %>" name="<%= column %>" value="<%= record[column] || '' %>" class="form-control">
             <% } %>
         </div>
-    <% }); %>
-    
-    <div style="margin-top: 2rem;">
-        <button type="submit" class="btn btn-success">Update Record</button>
-        <a href="/admin/<%= tableName %>" class="btn btn-primary">Cancel</a>
-    </div>
     </form>
 </div>
