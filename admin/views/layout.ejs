@@ -265,8 +265,10 @@
         color: #2c3e50;
       }
     </style>
-  </head>
-  <body>
+    <!-- Extracted styles from child views -->
+    <%- typeof style !== 'undefined' ? style : '' %>
+</head>
+<body>
     <div class="header">
       <h1>Warlordlands Admin Panel</h1>
     </div>
@@ -296,5 +298,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-  </body>
+    <!-- Extracted scripts from child views -->
+    <%- typeof script !== 'undefined' ? script : '' %>
+</body>
 </html>
