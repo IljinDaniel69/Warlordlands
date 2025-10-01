@@ -1,89 +1,105 @@
-import Army from '../entities/Army.js';
-import Unit from '../entities/Unit.js';
+const Army = require("../entities/Army");
+const Unit = require("../entities/Unit");
 
 class CombatEngine {
-    constructor(dbPool) {
-        this.dbPool = dbPool;
+  constructor(dbPool) {
+    this.dbPool = dbPool;
+  }
+
+  /**
+   * Calculate combat outcome between two armies
+   */
+  async calculateCombatOutcome(attackingArmyId, defendingArmyId) {
+    // Fetch armies and their units
+    const attacker = await Army.getById(this.dbPool, attackingArmyId);
+    const defender = await Army.getById(this.dbPool, defendingArmyId);
+
+    const attackerUnits = await Unit.getByArmyId(this.dbPool, attackingArmyId);
+    const defenderUnits = await Unit.getByArmyId(this.dbPool, defendingArmyId);
+
+    // Calculate total attacks and defences
+    const attackerAttack = attackerUnits.reduce(
+      (sum, u) =>
+        sum +
+        (u.unit_class.melee_combat || 0) +
+        (u.unit_class.ranged_combat || 0),
+      0
+    );
+    const defenderAttack = defenderUnits.reduce(
+      (sum, u) =>
+        sum +
+        (u.unit_class.melee_combat || 0) +
+        (u.unit_class.ranged_combat || 0),
+      0
+    );
+
+    const attackerDefence = attackerUnits.reduce(
+      (sum, u) => sum + (u.unit_class.defence || 0),
+      0
+    );
+    const defenderDefence = defenderUnits.reduce(
+      (sum, u) => sum + (u.unit_class.defence || 0),
+      0
+    );
+
+    // Final attack scores
+    const attackerFinal = attackerAttack - defenderDefence;
+    const defenderFinal = defenderAttack - attackerDefence;
+
+    // Determine winner and loser
+    let winner, loser, damage;
+    if (attackerFinal > defenderFinal) {
+      winner = "attacker";
+      loser = defenderUnits;
+      damage = attackerFinal - defenderFinal;
+    } else if (defenderFinal > attackerFinal) {
+      winner = "defender";
+      loser = attackerUnits;
+      damage = defenderFinal - attackerFinal;
+    } else {
+      winner = "draw";
+      damage = 0;
     }
 
-    /**
-     * Calculate combat outcome between two armies
-     */
-    async calculateCombatOutcome(attackingArmy, defendingArmy) {
-        try {
-            const calculateTotals = (army) => {
-                const totalMelee = army.reduce((sum, unit) => sum + unit.melee_combat, 0);
-                const totalRanged = army.reduce((sum, unit) => sum + unit.ranged_combat, 0);
-                const totalDefense = army.reduce((sum, unit) => sum + unit.defense, 0);
-                return { totalAttack: totalMelee + totalRanged, totalDefense };
-            };
-
-            const attackerTotals = calculateTotals(attackingArmy);
-            const defenderTotals = calculateTotals(defendingArmy);
-
-            const finalAttack1 = Math.max(0, attackerTotals.totalAttack - defenderTotals.totalDefense);
-            const finalAttack2 = Math.max(0, defenderTotals.totalAttack - attackerTotals.totalDefense);
-
-            let winner, loser, damage;
-
-            if (finalAttack1 > finalAttack2) {
-                winner = 'attacker';
-                loser = defendingArmy;
-                damage = finalAttack1 - finalAttack2;
-            } else if (finalAttack2 > finalAttack1) {
-                winner = 'defender';
-                loser = attackingArmy;
-                damage = finalAttack2 - finalAttack1;
-            } else {
-                return {
-                    winner: 'draw',
-                    message: "It's a draw!",
-                    updatedAttackingArmy: attackingArmy,
-                    updatedDefendingArmy: defendingArmy
-                };
-            }
-
-            // Apply damage to the losing army
-            loser.sort((a, b) => a.hp - b.hp); // Sort units by HP (ascending)
-            for (const unit of loser) {
-                if (damage <= 0) break;
-                if (unit.hp <= damage) {
-                    damage -= unit.hp;
-                    unit.hp = 0;
-                } else {
-                    unit.hp -= damage;
-                    damage = 0;
-                }
-            }
-
-            return {
-                winner,
-                message: `${winner === 'attacker' ? 'Attacking army' : 'Defending army'} wins!`,
-                updatedAttackingArmy: attackingArmy,
-                updatedDefendingArmy: defendingArmy
-            };
-        } catch (error) {
-            console.error('Error calculating combat outcome:', error);
-            throw error;
-        }
+    // Apply damage to losing army units (lowest HP first)
+    if (damage > 0 && winner !== "draw") {
+      // Sort units by current hitpoints ascending
+      loser.sort((a, b) => a.current_hitpoints - b.current_hitpoints);
+      let remainingDamage = damage;
+      for (const unit of loser) {
+        if (remainingDamage <= 0) break;
+        const hpLoss = Math.min(unit.current_hitpoints, remainingDamage);
+        await unit.takeDamage(this.dbPool, hpLoss);
+        remainingDamage -= hpLoss;
+      }
     }
 
-    /**
-     * Process battle results and update army/unit states
-     */
-    async processBattleResults(battleId, results) {
-        try {
-            // TODO: Implement battle result processing
-            console.log('Battle results received:', results);
-            return {
-                success: true,
-                message: 'Battle results logged (processing not yet implemented)'
-            };
-        } catch (error) {
-            console.error('Error processing battle results:', error);
-            throw error;
-        }
+    return {
+      winner,
+      attackerFinal,
+      defenderFinal,
+      damage,
+    };
+  }
+
+  /**
+   * Process battle results and update army/unit states
+   * This is a placeholder for future combat implementation
+   */
+  async processBattleResults(battleId, results) {
+    try {
+      // TODO: Implement battle result processing
+      // For now, just log the results
+      console.log("Battle results received:", results);
+      return {
+        success: true,
+        message: "Battle results logged (processing not yet implemented)",
+      };
+    } catch (error) {
+      console.error("Error processing battle results:", error);
+      throw error;
     }
+  }
 }
 
 module.exports = CombatEngine;
