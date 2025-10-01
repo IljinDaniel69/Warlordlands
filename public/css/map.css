@@ -1,313 +1,470 @@
 .map-container {
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 15px;
-    padding: 2rem;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 15px;
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
 }
 
 .map-controls {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1rem;
-    align-items: center;
-    flex-wrap: wrap;
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .coordinates-display {
-    background: rgba(52, 152, 219, 0.1);
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    font-family: monospace;
-    font-weight: 600;
-    color: #2c3e50;
+  background: rgba(52, 152, 219, 0.1);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-family: monospace;
+  font-weight: 600;
+  color: #2c3e50;
 }
 
 .map-viewport {
-    border: 2px solid #3498db;
-    border-radius: 8px;
-    overflow: auto;
-    background: #f8f9fa;
-    position: relative;
-    padding: 1rem;
+  border: 2px solid #3498db;
+  border-radius: 8px;
+  overflow: auto;
+  background: #f8f9fa;
+  position: relative;
+  padding: 1rem;
 }
 
 .map-grid {
-    display: table;
-    border-collapse: collapse;
-    background: #ddd;
-    transform-origin: center;
-    transition: transform 0.3s ease;
-    width: fit-content;
-    margin: 0 auto;
+  display: table;
+  border-collapse: collapse;
+  background: #ddd;
+  transform-origin: center;
+  transition: transform 0.3s ease;
+  width: fit-content;
+  margin: 0 auto;
 }
 
 .map-row {
-    display: table-row;
+  display: table-row;
 }
 
 /* Fallback for browsers that don't support grid well */
 .map-grid.fallback {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1px;
-    justify-content: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1px;
+  justify-content: center;
 }
 
 .map-tile {
-    width: 30px;
-    height: 30px;
-    border: 1px solid rgba(0, 0, 0, 0.2);
-    cursor: pointer;
-    position: relative;
-    transition: all 0.2s ease;
-    display: table-cell;
-    vertical-align: middle;
-    text-align: center;
-    font-size: 12px;
-    font-weight: bold;
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+  font-size: 12px;
+  font-weight: bold;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
 .map-tile:hover {
-    transform: scale(1.1);
-    z-index: 10;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transform: scale(1.1);
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .map-tile.selected {
-    border: 3px solid #e74c3c;
-    transform: scale(1.1);
-    z-index: 10;
-    box-shadow: 0 0 15px rgba(231, 76, 60, 0.5);
+  border: 3px solid #e74c3c;
+  transform: scale(1.1);
+  z-index: 10;
+  box-shadow: 0 0 15px rgba(231, 76, 60, 0.5);
 }
 
 /* Move mode highlighting */
 .map-tile.move-start {
-    border: 3px solid #27ae60;
-    background: rgba(39, 174, 96, 0.3);
-    transform: scale(1.1);
-    z-index: 10;
-    box-shadow: 0 0 15px rgba(39, 174, 96, 0.5);
+  border: 3px solid #27ae60;
+  background: rgba(39, 174, 96, 0.3);
+  transform: scale(1.1);
+  z-index: 10;
+  box-shadow: 0 0 15px rgba(39, 174, 96, 0.5);
 }
 
 .map-tile.move-path {
-    border: 3px solid #3498db;
-    background: rgba(52, 152, 219, 0.3);
-    transform: scale(1.05);
-    z-index: 9;
-    box-shadow: 0 0 10px rgba(52, 152, 219, 0.4);
+  border: 3px solid #3498db;
+  background: rgba(52, 152, 219, 0.3);
+  transform: scale(1.05);
+  z-index: 9;
+  box-shadow: 0 0 10px rgba(52, 152, 219, 0.4);
 }
 
 .map-tile.move-end {
-    border: 3px solid #e67e22;
-    background: rgba(230, 126, 34, 0.3);
-    transform: scale(1.1);
-    z-index: 10;
-    box-shadow: 0 0 15px rgba(230, 126, 34, 0.5);
+  border: 3px solid #e67e22;
+  background: rgba(230, 126, 34, 0.3);
+  transform: scale(1.1);
+  z-index: 10;
+  box-shadow: 0 0 15px rgba(230, 126, 34, 0.5);
 }
 
 /* Path display styles */
 .path-display {
-    background: #f8f9fa;
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
-    padding: 1rem;
-    margin-bottom: 1rem;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
 }
 
 .path-step {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-    padding: 0.25rem 0.5rem;
-    background: white;
-    border-radius: 4px;
-    border: 1px solid #e9ecef;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  background: white;
+  border-radius: 4px;
+  border: 1px solid #e9ecef;
 }
 
 .path-step:last-child {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 .path-step .badge {
-    min-width: 60px;
+  min-width: 60px;
 }
-
-
 
 /* Terrain Types */
-.terrain-open { 
-    background: linear-gradient(135deg, #90EE90, #7CFC00);
-    position: relative;
+.terrain-open {
+  background: linear-gradient(135deg, #90ee90, #7cfc00);
+  position: relative;
 }
 
-.terrain-forest { 
-    background: linear-gradient(135deg, #228B22, #006400);
-    position: relative;
+.terrain-forest {
+  background: linear-gradient(135deg, #228b22, #006400);
+  position: relative;
 }
 
-.terrain-mountains { 
-    background: linear-gradient(135deg, #8B4513, #654321);
-    position: relative;
+.terrain-mountains {
+  background: linear-gradient(135deg, #8b4513, #654321);
+  position: relative;
 }
 
-.terrain-water { 
-    background: linear-gradient(135deg, #4169E1, #1E90FF);
-    position: relative;
+.terrain-water {
+  background: linear-gradient(135deg, #4169e1, #1e90ff);
+  position: relative;
 }
 
-.terrain-desert { 
-    background: linear-gradient(135deg, #F4A460, #DEB887);
-    position: relative;
+.terrain-desert {
+  background: linear-gradient(135deg, #f4a460, #deb887);
+  position: relative;
 }
 
-.terrain-hills { 
-    background: linear-gradient(135deg, #A0522D, #8B4513);
-    position: relative;
+.terrain-hills {
+  background: linear-gradient(135deg, #a0522d, #8b4513);
+  position: relative;
 }
 
-.terrain-unknown { 
-    background: linear-gradient(135deg, #666, #444);
-    position: relative;
+.terrain-unknown {
+  background: linear-gradient(135deg, #666, #444);
+  position: relative;
 }
 
 .terrain-icon {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 14px;
-    pointer-events: none;
-    z-index: 1;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 14px;
+  pointer-events: none;
+  z-index: 1;
 }
 
 /* Army indicators */
 .army-indicator {
-    position: absolute;
-    top: 2px;
-    right: 2px;
-    background: #e74c3c;
-    color: white;
-    border-radius: 50%;
-    width: 16px;
-    height: 16px;
-    font-size: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: #e74c3c;
+  color: white;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
 }
 
 .player-army {
-    background: #27ae60 !important;
+  background: #27ae60 !important;
 }
 
 .enemy-army {
-    background: #e74c3c !important;
+  background: #e74c3c !important;
 }
 
 .map-legend {
-    margin-top: 2rem;
-    padding: 1rem;
-    background: rgba(52, 152, 219, 0.1);
-    border-radius: 8px;
+  margin-top: 2rem;
+  padding: 1rem;
+  background: rgba(52, 152, 219, 0.1);
+  border-radius: 8px;
 }
 
 .map-legend h4 {
-    margin-bottom: 1rem;
-    color: #2c3e50;
+  margin-bottom: 1rem;
+  color: #2c3e50;
 }
 
 .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .terrain-sample {
-    width: 24px;
-    height: 24px;
-    border: 1px solid rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    position: relative;
+  width: 24px;
+  height: 24px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  position: relative;
 }
 
-.terrain-sample.open { 
-    background: linear-gradient(135deg, #90EE90, #7CFC00);
+.terrain-sample.open {
+  background: linear-gradient(135deg, #90ee90, #7cfc00);
 }
-.terrain-sample.forest { 
-    background: linear-gradient(135deg, #228B22, #006400);
+.terrain-sample.forest {
+  background: linear-gradient(135deg, #228b22, #006400);
 }
-.terrain-sample.mountains { 
-    background: linear-gradient(135deg, #8B4513, #654321);
+.terrain-sample.mountains {
+  background: linear-gradient(135deg, #8b4513, #654321);
 }
-.terrain-sample.water { 
-    background: linear-gradient(135deg, #4169E1, #1E90FF);
+.terrain-sample.water {
+  background: linear-gradient(135deg, #4169e1, #1e90ff);
 }
-.terrain-sample.desert { 
-    background: linear-gradient(135deg, #F4A460, #DEB887);
+.terrain-sample.desert {
+  background: linear-gradient(135deg, #f4a460, #deb887);
 }
-.terrain-sample.hills { 
-    background: linear-gradient(135deg, #A0522D, #8B4513);
+.terrain-sample.hills {
+  background: linear-gradient(135deg, #a0522d, #8b4513);
 }
-.terrain-sample.unknown { 
-    background: linear-gradient(135deg, #666, #444);
-    color: #fff;
+.terrain-sample.unknown {
+  background: linear-gradient(135deg, #666, #444);
+  color: #fff;
 }
 
 .tile-info {
-    margin-top: 2rem;
-    padding: 1rem;
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 8px;
-    border-left: 4px solid #3498db;
+  margin-top: 2rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
+  border-left: 4px solid #3498db;
 }
 
 .tile-info h4 {
-    margin-bottom: 1rem;
-    color: #2c3e50;
+  margin-bottom: 1rem;
+  color: #2c3e50;
 }
 
 .tile-detail {
-    margin-bottom: 0.5rem;
-    padding: 0.5rem;
-    border-bottom: 1px solid #e9ecef;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  border-bottom: 1px solid #e9ecef;
 }
 
 .tile-detail:last-child {
-    border-bottom: none;
+  border-bottom: none;
 }
 
 .tile-detail strong {
-    color: #2c3e50;
-    display: block;
-    margin-bottom: 0.25rem;
+  color: #2c3e50;
+  display: block;
+  margin-bottom: 0.25rem;
 }
 
 .tile-detail .btn {
-    margin-top: 0.5rem;
+  margin-top: 0.5rem;
 }
 
 .tile-detail strong {
-    color: #2c3e50;
+  color: #2c3e50;
 }
 
 @media (max-width: 768px) {
-    .map-controls {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .map-tile {
-        width: 25px;
-        height: 25px;
-        font-size: 10px;
-    }
+  .map-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .map-tile {
+    width: 25px;
+    height: 25px;
+    font-size: 10px;
+  }
+}
+
+/* Poista ylimääräinen tila aiherivin ja valikon välistä */
+.header {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+.nav {
+  margin-top: 0;
+}
+
+/* Aseta käyttäjänimi ja Logout samalle riville muiden valikkokohtien kanssa */
+.nav .user-info {
+  display: inline-block;
+  margin-right: 15px;
+  vertical-align: middle;
+}
+
+.nav .logout {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* Kojelaudan yleinen asettelu */
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+/* Kojelaudan osiot */
+.dashboard-section {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-section h2 {
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  color: #343a40;
+}
+
+/* Kojelaudan ruudukko */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+/* Kojelaudan ruudut */
+.dashboard-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #007bff;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dashboard-tile:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  text-decoration: none;
+  color: #0056b3;
+}
+
+/* Karttanäkymän tyylit */
+.map-viewport {
+  display: grid;
+  grid-template-columns: repeat(20, 40px); /* 20 saraketta, 40px per ruutu */
+  grid-gap: 1px;
+  background: #ccc;
+  padding: 10px;
+  border: 1px solid #999;
+}
+
+.map-tile {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  text-align: center;
+  border: 1px solid #ddd;
+}
+
+.map-tile.terrain-forest {
+  background-color: #228b22;
+}
+
+.map-tile.terrain-mountains {
+  background-color: #a9a9a9;
+}
+
+.map-tile.terrain-water {
+  background-color: #1e90ff;
+}
+
+.map-tile.terrain-desert {
+  background-color: #edc9af;
+}
+
+.map-tile.terrain-hills {
+  background-color: #8b4513;
+}
+
+.army-indicator {
+  background: red;
+  color: white;
+  font-size: 0.7rem;
+  padding: 2px;
+  border-radius: 3px;
+}
+
+/* Olemassa oleva sisältö jatkuu... */
+.map-container {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 15px;
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+/* Poista ylimääräinen tila aihepalkin ja valikon välistä */
+.header {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+.nav {
+  margin-top: 0;
+}
+
+/* Poista "Tervetuloa" valikosta */
+.nav .welcome {
+  display: none;
+}
+
+/* Tasaa käyttäjätunnus ja uloskirjautuminen samalle riville muiden valikkokohtien kanssa */
+.nav .user-info {
+  display: inline-block;
+  margin-right: 15px;
+  vertical-align: middle;
+}
+
+.nav .logout {
+  display: inline-block;
+  vertical-align: middle;
 }
