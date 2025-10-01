@@ -1,10 +1,11 @@
 <div class="form-container">
     <h2>Edit <%= displayName %></h2>
-    <form method="POST" action="/admin/<%= tableName %>/edit/<%= record.type %>">
+
+    <form method="POST" action="/admin/<%= tableName %>/edit/<%= record.type || record.keyword %>">
     <% columns.forEach(function(column) { %>
         <div class="form-group">
             <label for="<%= column %>"><%= column %>:</label>
-            <% if (column === 'type') { %>
+            <% if (column === 'type' || column === 'keyword') { %>
                 <input type="text" id="<%= column %>" name="<%= column %>" value="<%= record[column] %>" class="form-control" readonly>
             <% } else if (typeof record[column] === 'boolean') { %>
                 <select id="<%= column %>" name="<%= column %>" class="form-control">
